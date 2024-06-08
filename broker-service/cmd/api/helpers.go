@@ -7,14 +7,13 @@ import (
 	"net/http"
 )
 
-
 type jsonRespnse struct {
-	Error bool `json:"error"`
+	Error   bool   `json:"error"`
 	Message string `json:"message"`
-	data any `json:"data omitEmpty"`
+	Data    any    `json:"data omitEmpty"`
 }
 
-func(app *Config) readJSON(w http.ResponseWriter, r *http.Request, data any) error {
+func (app *Config) readJSON(w http.ResponseWriter, r *http.Request, data any) error {
 	maxBytes := 1048576
 
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
@@ -22,23 +21,20 @@ func(app *Config) readJSON(w http.ResponseWriter, r *http.Request, data any) err
 	dec := json.NewDecoder(r.Body)
 	err := dec.Decode(&data)
 	if err != nil {
-		return err 
+		return err
 	}
 
-	err = dec.Decode(struct{}{})
+	err = dec.Decode(&struct{}{})
 
 	if err != io.EOF {
 		return errors.New("body must have a single json object")
-	}	
+	}
 
 	return nil
-	
-	
+
 }
 
-
-
-func(app *Config) writeJSON(w http.ResponseWriter, status int, data any, headers http.Header) error{
+func (app *Config) writeJSON(w http.ResponseWriter, status int, data any, headers http.Header) error {
 	out, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		return err
@@ -61,9 +57,9 @@ func(app *Config) writeJSON(w http.ResponseWriter, status int, data any, headers
 	return nil
 }
 
-func(app *Config) errJSON(w http.ResponseWriter, errObj error, status int) error{
-	payload := jsonRespnse {
-		Error: true,
+func (app *Config) errJSON(w http.ResponseWriter, errObj error, status int) error {
+	payload := jsonRespnse{
+		Error:   true,
 		Message: errObj.Error(),
 	}
 

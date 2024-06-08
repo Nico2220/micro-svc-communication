@@ -5,19 +5,20 @@ import (
 	"log"
 	"net/http"
 )
+
 const (
 	WebPort = "8080"
 )
 
 type Config struct{}
-func main(){
+
+func main() {
 	app := Config{}
 
 	log.Printf("starting broker service on port %s\n", WebPort)
 
-
 	srv := &http.Server{
-		Addr: fmt.Sprintf(":%s", WebPort),
+		Addr:    fmt.Sprintf(":%s", WebPort),
 		Handler: app.routes(),
 	}
 
