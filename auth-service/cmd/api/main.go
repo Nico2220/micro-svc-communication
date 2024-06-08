@@ -1,16 +1,22 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/Nico2220/auth-service/data"
 )
 
 const (
 	Port = "8080"
 )
 
-type Config struct{}
+type Config struct {
+	DB     *sql.DB
+	Models data.Models
+}
 
 func main() {
 	app := Config{}
