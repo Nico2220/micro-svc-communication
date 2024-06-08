@@ -30,7 +30,7 @@
 {{end}}
 
 {{define "js"}}
-    <script>
+    <script defer>
         let brokerBtn = document.getElementById("broker-btn")
         let output = document.getElementById("output")
         let payload = document.getElementById("payload")
@@ -45,11 +45,12 @@
 
             try {         
                 response = await fetch("http://localhost:8080", body)
-                responseJson = await response.json()
-                received.innerHTML = JSON.stringify(responseJson, undefined, 4)
+                data = await response.json()
+                received.innerHTML = JSON.stringify(data, undefined, 4)
                 output.innerHTML = data.message
+                console.log(data)
             }catch(err){
-                cosole.log(err)
+                output.innerHTML =  "<br>Error</br>:" + err.message
             }
 
    
