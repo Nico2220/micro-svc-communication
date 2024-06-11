@@ -12,3 +12,15 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: ./auth-service.dockerfile
+    container_name: auth-service
+    restart: always
+    ports:
+      - "8081:8080"
+    deploy:
+      mode: replicated
+      replicas: 1

@@ -4,7 +4,6 @@ WORKDIR /app
 
 COPY . /app
 
-
 RUN CGO_ENABLE=0 go build -o authservice ./cmd/api
 
 
