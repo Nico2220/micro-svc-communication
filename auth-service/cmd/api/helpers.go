@@ -13,13 +13,13 @@ type jsonRespnse struct {
 	Data    any    `json:"data,omitempty"`
 }
 
-func (app *Config) readJSON(w http.ResponseWriter, r *http.Request, data any) error {
+func (app *Config) readJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1048576
 
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 
 	dec := json.NewDecoder(r.Body)
-	err := dec.Decode(&data)
+	err := dec.Decode(&dst)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,6 @@ func (app *Config) writeJSON(w http.ResponseWriter, status int, data any, header
 		return err
 	}
 
-	out = append(out, '\n')
 	if len(headers) > 0 {
 		for key, value := range headers {
 			w.Header()[key] = value

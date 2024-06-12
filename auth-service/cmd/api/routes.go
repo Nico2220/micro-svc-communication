@@ -22,6 +22,6 @@ func (app *Config) routes() http.Handler {
 	r.Use(middleware.Logger)
 
 	r.Use(middleware.Heartbeat("/ping"))
-	r.Get("/", app.auth)
+	r.Post("/auth", app.auth)
 	return r
 }
