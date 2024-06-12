@@ -7,6 +7,7 @@
                 <h1 class="mt-5">Test microservices</h1>
                 <hr>
                 <button id="broker-btn" class="btn btn-outline-secondary">Test Broker </button>
+                 <button id="auth-btn" class="btn btn-outline-secondary">Test Auth </button>
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output shows here...</span>
                 </div>
@@ -32,11 +33,42 @@
 {{define "js"}}
     <script defer>
         let brokerBtn = document.getElementById("broker-btn")
+        let authBtn = document.getElementById("auth-btn")
         let output = document.getElementById("output")
         let payload = document.getElementById("payload")
         let received = document.getElementById("received")
+
+
+        authBtn.addEventListener("click", async()=>{
+            console.log("hello")
+            const data = {
+                "action":"auth", 
+                "auth": {
+                    "email":"admin@gmail.com", 
+                    "password":"admin123"
+                }
+            }
+
+            const body = {
+                method: "POST",
+                body : JSON.stringify(data)
+
+            }
+
+            try {
+                response = await fetch("http://localhost:8080/brokerr", body)
+                jsonData = await response.json()
+                
+                received.innerHTML = JSON.stringify(jsonData, undefined, 4)
+                payload.innerHTML = JSON.stringify(data, undefined, 4)
+
+            }catch(err){
+                output.innerHTML =  `<br>${err.message}</br>`
+            }
+        })
+
         
-        brokerBtn.addEventListener("click", async()=> {
+        {{/* brokerBtn.addEventListener("click", async()=> {
             const body = {
                 method: "POST",
             }
@@ -49,11 +81,11 @@
                 received.innerHTML = JSON.stringify(data, undefined, 4)
                 output.innerHTML = data.message
                 console.log(data)
-            }catch(err){
-                output.innerHTML =  "<br>Error</br>:" + err.message
+            }catch(err) {
+                output.innerHTML = <"HELLO ERROR"
             }
 
    
-        })
+        }) */}}
     </script>
 {{end}}

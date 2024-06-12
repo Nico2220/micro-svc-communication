@@ -14,7 +14,7 @@ type RequestPayload struct{
 
 type AuthPayload struct {
 	Email string `json:"email"`
-	Password string `json:"password"`
+	Password string `json:"_"`
 }
 
 // { "action":"auth", "auth": {"email":"admin@gmail.com", "password":"admin123"}}
