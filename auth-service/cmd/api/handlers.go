@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	// "github.com/Nico2220/json_helpers"
 )
 
 func (app *Config) auth(w http.ResponseWriter, r *http.Request) {
