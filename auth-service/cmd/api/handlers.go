@@ -33,11 +33,9 @@ func (app *Config) auth(w http.ResponseWriter, r *http.Request) {
 	payload := jsonRespnse {
 		Error: false,
 		Message: fmt.Sprintf("Logged in user %s", input.Email),
-		Data: input,
+		Data: map[string]any{"email":input.Email},
 	}
 
 
-	tools.WriteJSON(w, http.StatusOK, payload, nil)
-
-	
+	tools.WriteJSON(w, http.StatusOK, payload, nil)	
 }

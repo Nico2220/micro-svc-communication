@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"github.com/Nico2220/tools"
 )
 
 type RequestPayload struct{
@@ -14,7 +16,7 @@ type RequestPayload struct{
 
 type AuthPayload struct {
 	Email string `json:"email"`
-	Password string `json:"_"`
+	Password string `json:"-"`
 }
 
 // { "action":"auth", "auth": {"email":"admin@gmail.com", "password":"admin123"}}
@@ -27,7 +29,7 @@ func (app *Config) broker(w http.ResponseWriter, r *http.Request) {
 func(app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	var requestPayload RequestPayload
 
-	err := app.readJSON(w, r, &requestPayload) 
+	err := tools.ReadJSON(w, r, &requestPayload) 
 	if err != nil {
 		app.errJSON(w, err, http.StatusBadRequest)
 	}
@@ -43,7 +45,7 @@ func(app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 
 
 func(app *Config) Authenticate(w http.ResponseWriter, a AuthPayload) {
-	jsonData, _ := json.MarshalIndent(a, "", "\t")
+	jsonData, _ := json.Marshal(a)
 
 	request, err := http.NewRequest("POST", "http://auth-service:8081/auth", bytes.NewBuffer(jsonData))
 	if err != nil {
@@ -66,7 +68,7 @@ func(app *Config) Authenticate(w http.ResponseWriter, a AuthPayload) {
 		return
 	}
 
-	var jsonFromService jsonRespnse
+	var jsonFromService jsonResponse
 
 	err =  json.NewDecoder(response.Body).Decode(&jsonFromService)
 	if err != nil {
@@ -79,7 +81,7 @@ func(app *Config) Authenticate(w http.ResponseWriter, a AuthPayload) {
 		return
 	}
 
-	payload := jsonRespnse {
+	payload := jsonResponse {
 		Error: false,
 		Message: "Authenticated",
 		Data: jsonFromService.Data,
