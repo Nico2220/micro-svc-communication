@@ -10,6 +10,7 @@ require (
 require golang.org/x/crypto v0.24.0
 
 require (
+	github.com/Nico2220/tools v1.0.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.3 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

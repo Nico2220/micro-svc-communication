@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
-	// "github.com/Nico2220/json_helpers"
+
+	"github.com/Nico2220/tools"
 )
 
 func (app *Config) auth(w http.ResponseWriter, r *http.Request) {
@@ -12,7 +13,7 @@ func (app *Config) auth(w http.ResponseWriter, r *http.Request) {
 		Email string `json:"email"`
 		Password string `json:"password"`
 	}
-	err := app.readJSON(w, r, &input)
+	err := tools.ReadJSON(w, r, &input)
 	if err != nil {
 		app.errJSON(w, err, http.StatusBadRequest)
 		return
@@ -35,7 +36,8 @@ func (app *Config) auth(w http.ResponseWriter, r *http.Request) {
 		Data: input,
 	}
 
-	app.writeJSON(w, http.StatusOK, payload, nil)
+
+	tools.WriteJSON(w, http.StatusOK, payload, nil)
 
 	
 }
