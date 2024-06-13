@@ -56,7 +56,7 @@
             }
 
             try {
-                response = await fetch("http://localhost:8080/brokerr", body)
+                response = await fetch("http://localhost:8080/broker", body)
                 jsonData = await response.json()
                 
                 received.innerHTML = JSON.stringify(jsonData, undefined, 4)
