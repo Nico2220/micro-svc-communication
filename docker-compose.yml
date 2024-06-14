@@ -27,6 +27,17 @@ services:
     environment:
       DSN: "host=postgres port=5432 user=postgres password=password dbname=users sslmode=disable"
 
+  logger-service:
+    build:
+      context: ./logger-service
+      dockerfile: ./logger-service.dockerfile
+    container_name: logger-service
+    restart: always
+    ports:
+      - "8082:8080"
+    environment:
+      MONGO_URI: "mongodb://mongo:27017"
+
   postgres:
     image: postgres
     ports:

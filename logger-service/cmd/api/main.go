@@ -45,7 +45,7 @@ func main() {
 	flag.StringVar(&cfg.env, "env", "dev", "evironment")
 	flag.IntVar(&cfg.rpcPort, "rpcPort", 5001, "rpc port")
 	flag.IntVar(&cfg.gRPCPort, "gRPCPort", 50001, "gRPCPort port")
-	flag.StringVar(&cfg.db.URI, "MONGO_URI", "mongodb://localhost:27017", "mongo db uri")
+	flag.StringVar(&cfg.db.URI, "MONGO_URI", "mongodb://mongo:27017", "mongo db uri")
 	
 	mongoClient, err := connectToMongo(cfg)
 	if err != nil {

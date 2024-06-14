@@ -88,11 +88,11 @@ func (m *LogEntryModel) GetAll() ([]*LogEntry, error) {
 
 
 // Get by 30
-func(l *LogEntryModel)  GetOne() (*LogEntry, error) {
+func(m *LogEntryModel)  GetOne() (*LogEntry, error) {
 	return nil, nil 
 }
 
-func(l LogEntryModel) DropCollection() error {
+func(m LogEntryModel) DropCollection() error {
 	return nil
 }
 
