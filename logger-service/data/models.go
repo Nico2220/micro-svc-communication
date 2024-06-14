@@ -9,18 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var client *mongo.Client
-
-type Models struct {
-	LogEntry LogEntry
-}
-
-func New(mongo *mongo.Client) Models {
-	client = mongo
-	return Models{
-		LogEntry: LogEntry{},
-	}
-}
 
 type LogEntry struct {
 	ID        string `bson:"_id" json:"id"`
@@ -30,8 +18,25 @@ type LogEntry struct {
 	UpdatedAt string `bson:"updated_at" json:"updated_at"`
 }
 
-func (l *LogEntry) Insert(entry LogEntry) error {
-	collection := client.Database("logs").Collection("log")
+
+type Models struct {
+	LogEntry LogEntryModel
+}
+
+func New(mongo *mongo.Client) Models {
+	
+	return Models{
+		LogEntry: LogEntryModel{mongo},
+	}
+}
+
+
+type LogEntryModel struct{
+	DB *mongo.Client
+}
+
+func (m *LogEntryModel) Insert(entry LogEntry) error {
+	collection := m.DB.Database("logs").Collection("log")
 	_, err := collection.InsertOne(context.TODO(), LogEntry{
 		Name:      entry.Name,
 		Data:      entry.Data,
@@ -47,12 +52,12 @@ func (l *LogEntry) Insert(entry LogEntry) error {
 
 }
 
-func (l *LogEntry) GetAll() ([]*LogEntry, error) {
+func (m *LogEntryModel) GetAll() ([]*LogEntry, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	collection := client.Database("logs").Collection("logs")
+	collection := m.DB.Database("logs").Collection("logs")
 
 	opts := options.Find()
 	opts.SetSort(bson.D{})
@@ -83,11 +88,11 @@ func (l *LogEntry) GetAll() ([]*LogEntry, error) {
 
 
 // Get by 30
-func(l *LogEntry)  GetOne() (*LogEntry, error) {
+func(l *LogEntryModel)  GetOne() (*LogEntry, error) {
 	return nil, nil 
 }
 
-func(l LogEntry) DropCollection() error {
+func(l LogEntryModel) DropCollection() error {
 	return nil
 }
 
