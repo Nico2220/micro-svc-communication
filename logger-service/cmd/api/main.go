@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,45 +13,64 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const (
-	port     = "8082"
-	rpcPort  = "5001"
-	mongoURI = "mongodb://localhost:27017"
-	gRpcPort = "50001"
-)
+// const (
+// 	port     = "8082"
+// 	rpcPort  = "5001"
+// 	mongoURI = "mongodb://localhost:27017"
+// 	gRpcPort = "50001"
+// )
 
-var client *mongo.Client
 
-type Config struct {
+
+type config struct {
 	Models data.Models
+	port int
+	env string
+	rpcPort int
+	gRPCPort int
+	db struct {
+		URI string
+	}
+}
+
+type application struct {
+	config config
+	models data.Models
 }
 
 func main() {
-	mongoClient, err := connectToMongo()
+	var cfg config
+
+	flag.IntVar(&cfg.port, "port", 8080, "API server port")
+	flag.StringVar(&cfg.env, "env", "dev", "evironment")
+	flag.IntVar(&cfg.rpcPort, "rpcPort", 5001, "rpc port")
+	flag.IntVar(&cfg.gRPCPort, "gRPCPort", 50001, "gRPCPort port")
+	flag.StringVar(&cfg.db.URI, "MONGO_URI", "mongodb://localhost:27017", "mongo db uri")
+	
+	mongoClient, err := connectToMongo(cfg)
 	if err != nil {
 		log.Panic()
 	}
 
-	log.Println("connted to db...")
-
-	client = mongoClient
+	log.Println("connected to mongodb...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	// close connection
 	defer func() {
-		if err = client.Disconnect(ctx); err != nil {
+		if err = mongoClient.Disconnect(ctx); err != nil {
 			panic(err)
 		}
 	}()
 
-	app := Config{
-		Models: data.New(client),
+	app := application{
+		config: cfg,
+		models: data.New(mongoClient),
 	}
 
-	log.Println("api is running on port", port)
-	
+	log.Println("api is running on port", app.config.port)
+
 	err = app.serve() 
 	if err != nil {
 		panic(err)
@@ -58,9 +78,9 @@ func main() {
 }
 
 
-func(app *Config) serve() error{
+func(app *application) serve() error{
 	srv := &http.Server{
-		Addr: fmt.Sprintf(":%s", port),
+		Addr: fmt.Sprintf(":%d", app.config.port),
 		Handler: app.routes(),
 	}
 
@@ -72,11 +92,11 @@ func(app *Config) serve() error{
 	return nil
 }
 
-func connectToMongo() (*mongo.Client, error) {
+func connectToMongo(cfg config) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	clientOptions := options.Client().ApplyURI(mongoURI)
+	clientOptions := options.Client().ApplyURI(cfg.db.URI)
 	clientOptions.SetAuth(options.Credential{
 		Username: "admin",
 		Password: "password",
