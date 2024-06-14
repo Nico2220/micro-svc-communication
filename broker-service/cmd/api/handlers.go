@@ -21,12 +21,12 @@ type AuthPayload struct {
 
 // { "action":"auth", "auth": {"email":"admin@gmail.com", "password":"admin123"}}
 
-func (app *Config) broker(w http.ResponseWriter, r *http.Request) {
+func (app *application) broker(w http.ResponseWriter, r *http.Request) {
 	
 
 }
 
-func(app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
+func(app *application) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	var requestPayload RequestPayload
 
 	err := tools.ReadJSON(w, r, &requestPayload) 
@@ -44,7 +44,7 @@ func(app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func(app *Config) Authenticate(w http.ResponseWriter, a AuthPayload) {
+func(app *application) Authenticate(w http.ResponseWriter, a AuthPayload) {
 	jsonData, _ := json.Marshal(a)
 
 	request, err := http.NewRequest("POST", "http://auth-service:8081/auth", bytes.NewBuffer(jsonData))
@@ -88,7 +88,7 @@ func(app *Config) Authenticate(w http.ResponseWriter, a AuthPayload) {
 	}
 
 
-	err = app.writeJSON(w, http.StatusAccepted, payload, nil)
+	err = tools.WriteJSON(w, http.StatusAccepted, payload, nil)
 	if err != nil {
 		app.errJSON(w, err, http.StatusInternalServerError)
 		return

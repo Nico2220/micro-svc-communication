@@ -1,24 +1,35 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 )
 
-const (
-	Port = "8080"
-)
+type config struct{
+	port int
+	env string
+}
 
-type Config struct{}
+type application struct {
+	config config
+}
 
 func main() {
-	app := Config{}
+	var cfg config
 
-	log.Printf("starting broker service on port %s\n", Port)
+	flag.IntVar(&cfg.port, "port", 8080, "API server port")
+	flag.StringVar(&cfg.env, "env","dev", "environment")
+
+	app := application {
+		config: cfg,
+	}
+
+	log.Printf("starting broker service on port %d\n", app.config.port)
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", Port),
+		Addr:    fmt.Sprintf(":%d", app.config.port),
 		Handler: app.routes(),
 	}
 
