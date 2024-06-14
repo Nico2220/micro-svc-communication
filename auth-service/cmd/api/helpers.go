@@ -56,7 +56,7 @@ type jsonRespnse struct {
 // 	return nil
 // }
 
-func (app *Config) errJSON(w http.ResponseWriter, errObj error, status int) error {
+func (app *application) errJSON(w http.ResponseWriter, errObj error, status int) error {
 	payload := jsonRespnse{
 		Error:   true,
 		Message: errObj.Error(),

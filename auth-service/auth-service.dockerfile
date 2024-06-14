@@ -2,7 +2,7 @@ FROM golang:1.22.2-alpine as builder
 
 WORKDIR /app
 
-COPY . /app
+COPY . ./
 
 RUN CGO_ENABLE=0 go build -o authservice ./cmd/api
 

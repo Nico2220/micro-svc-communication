@@ -7,10 +7,10 @@ import (
 	"github.com/Nico2220/tools"
 )
 
-func (app *Config) auth(w http.ResponseWriter, r *http.Request) {
+func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Hello From Auth-service")
 	var input struct {
-		Email string `json:"email"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 	err := tools.ReadJSON(w, r, &input)
@@ -22,7 +22,7 @@ func (app *Config) auth(w http.ResponseWriter, r *http.Request) {
 	// user, err := app.Models.User.GetByEmail(input.Email)
 	// if err != nil {
 	// 	app.errJSON(w, errors.New("invalid credantials"), http.StatusBadRequest)
-	// 	return 
+	// 	return
 	// }
 
 	// valid , err := user.PasswordMatches(input.Password)
@@ -30,12 +30,11 @@ func (app *Config) auth(w http.ResponseWriter, r *http.Request) {
 	// 	app.errJSON(w, errors.New("invalid credentials"), http.StatusBadRequest)
 	// }
 
-	payload := jsonRespnse {
-		Error: false,
+	payload := jsonRespnse{
+		Error:   false,
 		Message: fmt.Sprintf("Logged in user %s", input.Email),
-		Data: map[string]any{"email":input.Email},
+		Data:    map[string]any{"email": input.Email},
 	}
 
-
-	tools.WriteJSON(w, http.StatusOK, payload, nil)	
+	tools.WriteJSON(w, http.StatusOK, payload, nil)
 }

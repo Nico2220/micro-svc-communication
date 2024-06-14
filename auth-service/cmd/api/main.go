@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,35 +15,50 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-const (
-	Port = "8081"
-)
 
 var (
 	count = 0
 )
 
-type Config struct {
-	DB     *sql.DB
+type config struct {
+	port int
+	env  string
+	db   struct {
+		dsn string
+		// maxOpenConns int
+		// maxIdleConns int
+		// maxIdleTime time.Duration
+	}
+}
+
+type application struct {
+	config config
 	Models data.Models
 }
 
 func main() {
+	var cfg config
 
-	log.Printf("starting authentication service on port %s\n", Port)
+	flag.IntVar(&cfg.port, "port", 8081, "API server port")
+	flag.StringVar(&cfg.env, "env", "dev", "api environment")
+	flag.StringVar(&cfg.db.dsn, "dsn", os.Getenv("DSN"), "postgres db dsn")
 
-	conn := connectToDb()
+	flag.Parse()
+
+	log.Printf("starting authentication service on port %d \n", cfg.port)
+
+	conn := connectToDb(cfg)
 	if conn == nil {
 		log.Panic()
 	}
 
-	app := Config{
-		DB:     conn,
+	app := application{
+		config: cfg,
 		Models: data.New(conn),
 	}
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", Port),
+		Addr:    fmt.Sprintf(":%d", app.config.port),
 		Handler: app.routes(),
 	}
 
@@ -67,12 +83,11 @@ func openDb(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
-func connectToDb() *sql.DB {
-	dsn := os.Getenv("DSN")
+func connectToDb(cfg config) *sql.DB {
 
 	for {
 
-		conn, err := openDb(dsn)
+		conn, err := openDb(cfg.db.dsn)
 		if err != nil {
 			log.Println("Postgres not yet ready...")
 			count++
