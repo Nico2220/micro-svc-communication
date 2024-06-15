@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/Nico2220/tools"
@@ -12,6 +13,7 @@ import (
 type RequestPayload struct{
 	Action string `json:"action"`
 	Auth AuthPayload `json:"auth,omitempty"`
+	Log LogPayload `json:"log,omitempty"`
 }
 
 type AuthPayload struct {
@@ -19,12 +21,14 @@ type AuthPayload struct {
 	Password string `json:"-"`
 }
 
+type LogPayload struct {
+	Name string `json:"name"`
+	Data any `json:"data"` 
+}
+
 // { "action":"auth", "auth": {"email":"admin@gmail.com", "password":"admin123"}}
 
-func (app *application) broker(w http.ResponseWriter, r *http.Request) {
-	
-
-}
+func (app *application) broker(w http.ResponseWriter, r *http.Request) {}
 
 func(app *application) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	var requestPayload RequestPayload
@@ -38,16 +42,59 @@ func(app *application) HandleSubmission(w http.ResponseWriter, r *http.Request) 
 	switch requestPayload.Action {
 	case "auth":
 		app.Authenticate(w, requestPayload.Auth)
+	case "log":
+		app.WriteLogItem(w, requestPayload.Log)
 	default:
 		app.errJSON(w, errors.New("unknown action"), http.StatusMethodNotAllowed)
 	}
+}
+ 
+func(app *application) WriteLogItem(w http.ResponseWriter, l LogPayload){
+	jsonData, _ := json.Marshal(l)
+
+	request, err := http.NewRequest("POST", fmt.Sprintf("http://logger-service:%d", app.config.port), bytes.NewBuffer(jsonData))
+	if err != nil {
+		app.errJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	client := &http.Client{}
+	response, err :=  client.Do(request)
+	if err != nil {
+		app.errJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	defer response.Body.Close()
+
+	var jsonFromLog jsonResponse 
+
+	err = json.NewDecoder(response.Body).Decode(&jsonFromLog)
+	if err != nil {
+		app.errJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if jsonFromLog.Error {
+		app.errJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	payload := jsonResponse {
+		Error: jsonFromLog.Error,
+		Message: jsonFromLog.Message,
+		Data: jsonFromLog.Data,
+	}
+
+	tools.WriteJSON(w, response.StatusCode, payload, nil)
+
 }
 
 
 func(app *application) Authenticate(w http.ResponseWriter, a AuthPayload) {
 	jsonData, _ := json.Marshal(a)
 
-	request, err := http.NewRequest("POST", "http://auth-service:8081/auth", bytes.NewBuffer(jsonData))
+	request, err := http.NewRequest("POST",  fmt.Sprintf("http://auth-service:%d/auth", app.config.port), bytes.NewBuffer(jsonData))
 	if err != nil {
 		app.errJSON(w, err, http.StatusBadRequest)
 		return

@@ -9,17 +9,16 @@ import (
 )
 
 type jsonResponse struct {
-	Error bool `json:"error"`
+	Error   bool   `json:"error"`
 	Message string `json:"message"`
-	Data any `json:"data,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
-
-func(app *application) writeLog(w http.ResponseWriter, r *http.Request){
+func (app *application) writeLog(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Hello from logger New")
 	var input struct {
-		Name      string `bson:"name" json:"name"`
-		Data      string `bson:"data" json:"data"`
+		Name string `bson:"name" json:"name"`
+		Data string `bson:"data" json:"data"`
 	}
 
 	err := tools.ReadJSON(w, r, &input)
@@ -33,12 +32,12 @@ func(app *application) writeLog(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	logEntry := data.LogEntry {
+	logEntry := data.LogEntry{
 		Name: input.Name,
 		Data: input.Data,
 	}
 
-	err= app.models.LogEntry.Insert(logEntry)
+	err = app.models.LogEntry.Insert(logEntry)
 
 	if err != nil {
 		payload := jsonResponse{
@@ -49,10 +48,10 @@ func(app *application) writeLog(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	payload := jsonResponse {
-		Error: false,
+	payload := jsonResponse{
+		Error:   false,
 		Message: "Logentry inserted with success",
-		Data: input.Data,
+		Data:    input.Data,
 	}
 
 	tools.WriteJSON(w, http.StatusCreated, payload, nil)

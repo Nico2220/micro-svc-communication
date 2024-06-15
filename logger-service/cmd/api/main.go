@@ -20,15 +20,13 @@ import (
 // 	gRpcPort = "50001"
 // )
 
-
-
 type config struct {
-	Models data.Models
-	port int
-	env string
-	rpcPort int
+	Models   data.Models
+	port     int
+	env      string
+	rpcPort  int
 	gRPCPort int
-	db struct {
+	db       struct {
 		URI string
 	}
 }
@@ -46,7 +44,7 @@ func main() {
 	flag.IntVar(&cfg.rpcPort, "rpcPort", 5001, "rpc port")
 	flag.IntVar(&cfg.gRPCPort, "gRPCPort", 50001, "gRPCPort port")
 	flag.StringVar(&cfg.db.URI, "MONGO_URI", "mongodb://mongo:27017", "mongo db uri")
-	
+
 	mongoClient, err := connectToMongo(cfg)
 	if err != nil {
 		log.Panic()
@@ -71,16 +69,15 @@ func main() {
 
 	log.Println("logger-service is running on port", app.config.port)
 
-	err = app.serve() 
+	err = app.serve()
 	if err != nil {
 		panic(err)
 	}
 }
 
-
-func(app *application) serve() error{
+func (app *application) serve() error {
 	srv := &http.Server{
-		Addr: fmt.Sprintf(":%d", app.config.port),
+		Addr:    fmt.Sprintf(":%d", app.config.port),
 		Handler: app.routes(),
 	}
 

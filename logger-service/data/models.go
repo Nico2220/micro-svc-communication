@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-
 type LogEntry struct {
 	// ID        string `bson:"_id" json:"id"`
 	Name      string `bson:"name" json:"name"`
@@ -18,24 +17,22 @@ type LogEntry struct {
 	UpdatedAt string `bson:"updated_at" json:"updated_at"`
 }
 
-
 type Models struct {
 	LogEntry LogEntryModel
 }
 
 func New(mongo *mongo.Client) Models {
-	
+
 	return Models{
 		LogEntry: LogEntryModel{mongo},
 	}
 }
 
-
-type LogEntryModel struct{
+type LogEntryModel struct {
 	DB *mongo.Client
 }
 
-func (m *LogEntryModel) Insert(entry LogEntry) (error) {
+func (m *LogEntryModel) Insert(entry LogEntry) error {
 	collection := m.DB.Database("logs").Collection("logs")
 	_, err := collection.InsertOne(context.TODO(), LogEntry{
 		Name:      entry.Name,
@@ -86,14 +83,11 @@ func (m *LogEntryModel) GetAll() ([]*LogEntry, error) {
 	return logs, nil
 }
 
-
 // Get by 30
-func(m *LogEntryModel)  GetOne() (*LogEntry, error) {
-	return nil, nil 
+func (m *LogEntryModel) GetOne() (*LogEntry, error) {
+	return nil, nil
 }
 
-func(m LogEntryModel) DropCollection() error {
+func (m LogEntryModel) DropCollection() error {
 	return nil
 }
-
-
