@@ -11,7 +11,7 @@ import (
 
 
 type LogEntry struct {
-	ID        string `bson:"_id" json:"id"`
+	// ID        string `bson:"_id" json:"id"`
 	Name      string `bson:"name" json:"name"`
 	Data      string `bson:"data" json:"data"`
 	CreateAt  string `bson:"create_at" json:"created_at"`
@@ -35,8 +35,8 @@ type LogEntryModel struct{
 	DB *mongo.Client
 }
 
-func (m *LogEntryModel) Insert(entry LogEntry) error {
-	collection := m.DB.Database("logs").Collection("log")
+func (m *LogEntryModel) Insert(entry LogEntry) (error) {
+	collection := m.DB.Database("logs").Collection("logs")
 	_, err := collection.InsertOne(context.TODO(), LogEntry{
 		Name:      entry.Name,
 		Data:      entry.Data,
@@ -48,7 +48,7 @@ func (m *LogEntryModel) Insert(entry LogEntry) error {
 		return err
 	}
 
-	return err
+	return nil
 
 }
 

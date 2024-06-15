@@ -39,7 +39,7 @@ type application struct {
 func main() {
 	var cfg config
 
-	flag.IntVar(&cfg.port, "port", 8081, "API server port")
+	flag.IntVar(&cfg.port, "port", 8080, "API server port")
 	flag.StringVar(&cfg.env, "env", "dev", "api environment")
 	flag.StringVar(&cfg.db.dsn, "dsn", os.Getenv("DSN"), "postgres db dsn")
 

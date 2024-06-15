@@ -69,7 +69,7 @@ func main() {
 		models: data.New(mongoClient),
 	}
 
-	log.Println("api is running on port", app.config.port)
+	log.Println("logger-service is running on port", app.config.port)
 
 	err = app.serve() 
 	if err != nil {
