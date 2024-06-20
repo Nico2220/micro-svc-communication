@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Nico2220/broker/event"
 	"github.com/Nico2220/tools"
 )
 
@@ -43,7 +44,8 @@ func(app *application) HandleSubmission(w http.ResponseWriter, r *http.Request) 
 	case "auth":
 		app.Authenticate(w, requestPayload.Auth)
 	case "log":
-		app.WriteLogItem(w, requestPayload.Log)
+		// app.WriteLogItem(w, requestPayload.Log)
+		app.logEventViaRabbitmq(w, requestPayload.Log)
 	default:
 		app.errJSON(w, errors.New("unknown action"), http.StatusMethodNotAllowed)
 	}
@@ -141,4 +143,41 @@ func(app *application) Authenticate(w http.ResponseWriter, a AuthPayload) {
 		return
 	}
 
+}
+
+func(app *application) logEventViaRabbitmq(w http.ResponseWriter, l LogPayload){
+	err := app.pushToQueue(l.Name, (l.Data).(string))
+	if err != nil {
+		app.errJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	jsonResponse := jsonResponse {
+		Error: false,
+		Message: "logged via rabbit mq",
+	}
+
+	tools.WriteJSON(w, http.StatusAccepted, jsonResponse, nil)
+}
+
+func(app *application) pushToQueue(name, msg string) error{
+	emitter, err := event.NewEmitter(app.config.rabbitmq)
+	if err != nil {
+		return err
+	}
+
+	payload := LogPayload {
+		Name: name,
+		Data: msg,
+	}
+
+
+	j, _ := json.Marshal(&payload)
+
+	err = emitter.Push(string(j), "log.INFO")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/Nico2220/listener-service/event"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -10,7 +11,7 @@ import (
 
 
 func main (){
-	conn, err := connect()
+	conn, err := connectToRabbitmq()
 	if  err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -24,18 +25,34 @@ func main (){
 		panic(err)
 	}
 
-	err = consumer.Listen([]string{"log.Info", "log.Error", "log.Warning"})
+	err = consumer.Listen([]string{"log.INFO", "log.ERROR", "log.WARNING"})
 	if err != nil {
 		log.Println(err)
 	}
 
 }
 
-func connect()(*amqp.Connection, error){
+func connectToRabbitmq()(*amqp.Connection, error){
+	count := 0
+	for {
 
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
-	if err != nil {
-		return nil, err
-	} 
-	return conn, nil
+		conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+		if err != nil {
+			log.Println("rabbitmq not ready yet...")
+		} else {
+			log.Println("connected to rabbitmq from broker service")
+			return conn, nil
+		}
+
+
+		if count >= 10 {
+			log.Println(err)
+			return nil, nil
+		}
+
+		time.Sleep(time.Second * 1)
+
+	}
+	
+
 }
