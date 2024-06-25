@@ -90,6 +90,7 @@ func(consumer *Consumer) Listen(topics []string) error{
 }
 
 func handlePayload(payload Payload){
+	fmt.Println("palyload=", payload)
 	switch payload.Name {
 	case "log", "event":
 		err := writeLogItem(payload)
@@ -103,10 +104,6 @@ func handlePayload(payload Payload){
 	}
 }
 
-// func logEvent(entry Payload) error {
-// 	fmt.Printf("The entry payload: %+v", entry)
-// 	return nil
-// }
 
 
 func writeLogItem(entry Payload) error {
